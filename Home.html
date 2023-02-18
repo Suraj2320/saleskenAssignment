@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz Page</title>
+  <link rel="stylesheet" href="./style/home.css">
+</head>
+<body>
+  <header>
+    <h1>Quiz Page</h1>
+  </header>
+  <main>
+    <div id="quiz"></div>
+    <div id="buttons">
+      <button id="skip">Skip</button>
+      <button id="next">Next</button>
+    </div>
+    <table id="reportt">
+      <th id="thh">
+        <tr>
+          <td id="que">Question No:-</td>
+          <td id="tdd">Right Answer</td>
+          <td id="tddd"> Your Answer</td>
+        </tr>
+      </th>
+      <tbody id="tbody"></tbody>
+    </table>
+  </main>
+</body>
+
+</html>
+<script>
+
+  var result = []
+
+
+  // Quiz page functionality
+  if (document.title === 'Quiz Page') {
+    const quiz = document.getElementById('quiz');
+    const skipButton = document.getElementById('skip');
+    const nextButton = document.getElementById('next');
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questions = [
+      {
+        question: ' Panna National Park is in which state?',
+        choices: ['Rajasthan', 'Maharashtra', 'Gujarat', 'Madhya Pradesh'],
+        answer: 'Madhya Pradesh'
+      },
+      {
+        question: ' What is the capital of Turkey?',
+        choices: ['Jerusalem', 'Canberra', 'Wellington', 'Ankara'],
+        answer: 'Ankara'
+      },
+
+      {
+        question: 'Who Invented the 3-D printer?',
+        choices: ['Nick Holonyak', ' Elias Howe', 'Chuck Hull', 'Christiaan Huygens'],
+        answer: 'Chuck Hull'
+      },
+      {
+        question: 'What is the maximum number of Members in Lok Sabha?',
+        choices: ['512', '542', '552', '532'],
+        answer: '552'
+      },
+      {
+        question: 'Which organ stores fat soluble vitamins?',
+        choices: ['Blood', 'Skin', 'Liver', 'Pancreas'],
+        answer: 'Liver'
+      },
+      {
+        question: 'Who invented the telephone?',
+        choices: ['Alexander Graham Bell', 'Thomas Edison', 'Benjamin Franklin', 'Albert Einstein'],
+        answer: 'Alexander Graham Bell'
+      },
+      {
+        question: ' Which of the following elements has lowest melting point? ',
+        choices: ['Titanium', ' Sulphur', 'Argon', 'Zinc'],
+        answer: 'Titanium'
+      },
+
+      {
+        question: 'What is the largest organ in the human body?',
+        choices: ['Brain', 'Heart', 'Liver', 'Skin'],
+        answer: 'Skin'
+      },
+      {
+        question: 'What is the fastest land animal?',
+        choices: ['Cheetah', 'Lion', 'Gazelle', 'Horse'],
+        answer: 'Cheetah'
+      },
+      {
+        question: ' The first president of the Republic of India was',
+        choices: [' V.V.Giri', 'Zakir Hussain', 'Dr.Radhakrishnan', 'Dr.Rajendra Prasad'],
+        answer: 'Dr.Rajendra Prasad'
+      }
+    ];
+    function displayQuestion(questionIndex) {
+      const question = questions[questionIndex];
+      const choices = question.choices.map((choice, index) =>
+        `
+      <label>
+        <input type="radio" name="choice" value="${choice}">${choice}
+      </label>
+    `).join('');
+      quiz.innerHTML = `
+      <div class="question">
+        <h2>Question ${questionIndex + 1}</h2>
+        <p>${question.question}</p>
+       
+        <form>${choices}</form>
+      </div>
+    `;
+      if (questionIndex === questions.length - 1) {
+        skipButton.innerHTML = 'Finish'
+      } else {
+        skipButton.innerHTML = 'Skip'
+      }
+    }
+    function checkAnswer(questionIndex, answer) {
+      let obj = {
+        "questionIndexx": questionIndex,
+        "rightAnswer": questions[questionIndex].answer,
+        "yourAnswer": answer
+      }
+      result.push(obj)
+
+
+
+      const question = questions[questionIndex];
+      if (answer === question.answer) {
+        score++;
+      }
+    }
+
+    function displayReportCard() {
+      localStorage.setItem('resultCard', JSON.stringify(result))
+
+      showResult(result)
+      quiz.innerHTML = `
+      <div class="question">
+      
+        <h2>Quiz Complete!</h2>
+        <p>You scored ${score} out of ${questions.length}.</p>
+      
+      </div>
+    `
+      localStorage.setItem('score', score)
+      localStorage.setItem('questions', JSON.stringify(questions))
+    }
+
+    function showResult(result) {
+
+
+
+      const tbod = document.getElementById('tbody');
+
+      tbod.style.border = "1px solid black"
+      let reportt = document.getElementById("reportt")
+
+      reportt.style.display = "block"
+      result.forEach((el) => {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.style.backgroundColor = "#008CBA"
+        td1.style.textAlign = "center"
+        td1.style.borderRadius = "10px"
+        td1.style.color = "white"
+
+        const td2 = document.createElement('td');
+        td2.style.textAlign = "center"
+        td2.style.backgroundColor = "Green"
+        td2.style.color = "white"
+
+
+
+        const td3 = document.createElement('td');
+        if (el.rightAnswer == el.yourAnswer) {
+          td3.style.backgroundColor = "Green"
+        } else[
+          td3.style.backgroundColor = "Red"
+        ]
+        td3.style.color = "white"
+        td3.style.padding = "10px"
+        td3.style.borderRadius = "10px"
+        td3.style.textAlign = "center"
+
+        td1.innerText = el.questionIndexx + 1;
+        td2.innerText = el.rightAnswer;
+        td3.innerText = el.yourAnswer;
+        tr.append(td1, td2, td3);
+        tbod.append(tr);
+      })
+    }
+
+
+
+    displayQuestion(currentQuestion)
+    skipButton.addEventListener('click', () => {
+      if (currentQuestion === questions.length - 1) {
+        displayReportCard();
+      } else {
+        currentQuestion++;
+        displayQuestion(currentQuestion);
+      }
+    });
+    nextButton.addEventListener('click', () => {
+      const selectedChoice = document.querySelector('input[name="choice"]:checked');
+      if (selectedChoice) {
+        const answer = selectedChoice.value;
+        checkAnswer(currentQuestion, answer);
+        if (currentQuestion === questions.length - 1) {
+          displayReportCard();
+        } else {
+          currentQuestion++;
+          displayQuestion(currentQuestion);
+        }
+      }
+    });
+  }
+
+
+
+</script>
